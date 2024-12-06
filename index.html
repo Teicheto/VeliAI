@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeliAI Чат система</title>
+    <style>
+        /* Основен стил за страницата */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            background-color: #1e1e1e;
+            color: #fff;
+        }
+
+        /* Стил за страничната лента */
+        .sidebar {
+            width: 250px;
+            background-color: #333;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            height: 100%;
+        }
+
+        .sidebar h3 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #f1f1f1;
+        }
+
+        .chat-item {
+            background-color: #444;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-item:hover {
+            background-color: #555;
+        }
+
+        .chat-item a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .chat-item button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .chat-item button:hover {
+            background-color: #c0392b;
+        }
+
+        /* Стил за основната част на съдържанието */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            background-color: #222;
+        }
+
+        .main-content h2 {
+            font-size: 32px;
+            color: #f1f1f1;
+        }
+
+        /* Стил за бутона за добавяне на чат */
+        .add-chat {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 18px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-chat:hover {
+            background-color: #27ae60;
+        }
+
+        .add-chat:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .chat-item span {
+            font-size: 14px;
+            color: #95a5a6;
+        }
+
+        /* Плаваща анимация за добавяне на чат */
+        @keyframes floatIn {
+            0% { opacity: 0; transform: translateX(-30px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+
+        .chat-item {
+            animation: floatIn 0.3s ease-out;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Странична лента с чатовете -->
+    <div class="sidebar">
+        <h3>Чатове</h3>
+        <div id="chat-list"></div>
+        <button class="add-chat" id="add-chat">+ Добави чат</button>
+    </div>
+
+    <!-- Основно съдържание -->
+    <div class="main-content">
+        <h2>Добре дошли в VeliAI Чат</h2>
+        <p>Изберете или създайте нов чат от страничната лента!</p>
+    </div>
+
+    <script>
+        let chatCount = 0;
+        const maxChats = 10;
+        const chatList = document.getElementById("chat-list");
+        const addChatButton = document.getElementById("add-chat");
+
+        // Функция за добавяне на нов чат
+        function addChat() {
+            if (chatCount >= maxChats) {
+                alert("Не можете да добавите повече от 10 чата.");
+                return;
+            }
+
+            chatCount++;
+            const chatName = prompt("Въведете името на чата:");
+            const chatId = `chat${chatCount}`;
+            const chatElement = document.createElement("div");
+            chatElement.classList.add("chat-item");
+
+            // Създаване на линк към новия чат
+            const chatLink = document.createElement("a");
+            chatLink.href = `${chatId}.html`;
+            chatLink.innerText = chatName || `Чат ${chatCount}`;
+
+            // Създаване на бутон за изтриване
+            const deleteButton = document.createElement("button");
+            deleteButton.innerText = "Изтрий";
+            deleteButton.onclick = function () {
+                chatList.removeChild(chatElement);
+                chatCount--;
+            };
+
+            chatElement.appendChild(chatLink);
+            chatElement.appendChild(deleteButton);
+            chatList.appendChild(chatElement);
+        }
+
+        // При натискане на бутон "Добави чат"
+        addChatButton.addEventListener("click", addChat);
+    </script>
+
+</body>
+</html>
