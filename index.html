@@ -137,46 +137,84 @@
         <h2>Добре дошли в VeliAI Чат</h2>
         <p>Изберете или създайте нов чат от страничната лента!</p>
     </div>
-
+    
     <script>
         let chatCount = 0;
-        const maxChats = 10;
-        const chatList = document.getElementById("chat-list");
-        const addChatButton = document.getElementById("add-chat");
+const maxChats = 10;
+const chatList = document.getElementById("chat-list");
+const addChatButton = document.getElementById("add-chat");
 
-        // Функция за добавяне на нов чат
-        function addChat() {
-            if (chatCount >= maxChats) {
-                alert("Не можете да добавите повече от 10 чата.");
-                return;
-            }
+// Функция за зареждане на чатовете от LocalStorage
+function loadChats() {
+    const savedChats = JSON.parse(localStorage.getItem("chats")) || [];
+    chatCount = savedChats.length;
+    savedChats.forEach(chat => {
+        createChatElement(chat.name, chat.id);
+    });
+}
 
-            chatCount++;
-            const chatName = prompt("Въведете името на чата:");
-            const chatId = `chat${chatCount}`;
-            const chatElement = document.createElement("div");
-            chatElement.classList.add("chat-item");
+// Функция за съхранение на чатовете в LocalStorage
+function saveChats() {
+    const chatElements = chatList.querySelectorAll(".chat-item");
+    const chats = Array.from(chatElements).map(chatElement => {
+        const link = chatElement.querySelector("a");
+        return { name: link.innerText, id: link.getAttribute("href").replace(".html", "") };
+    });
+    localStorage.setItem("chats", JSON.stringify(chats));
+}
 
-            // Създаване на линк към новия чат
-            const chatLink = document.createElement("a");
-            chatLink.href = `${chatId}.html`;
-            chatLink.innerText = chatName || `Чат ${chatCount}`;
+// Функция за създаване на елемент за чат
+function createChatElement(chatName, chatId) {
+    const chatElement = document.createElement("div");
+    chatElement.classList.add("chat-item");
 
-            // Създаване на бутон за изтриване
-            const deleteButton = document.createElement("button");
-            deleteButton.innerText = "Изтрий";
-            deleteButton.onclick = function () {
-                chatList.removeChild(chatElement);
-                chatCount--;
-            };
+    const chatLink = document.createElement("a");
+    chatLink.href = `${chatId}.html`; // Коригираме добавянето на ".html"
+    chatLink.innerText = chatName;
 
-            chatElement.appendChild(chatLink);
-            chatElement.appendChild(deleteButton);
-            chatList.appendChild(chatElement);
-        }
+    const deleteButton = document.createElement("button");
+    deleteButton.innerText = "Изтрий";
+    deleteButton.onclick = function () {
+        chatList.removeChild(chatElement);
+        chatCount--;
+        saveChats();
+        updateAddChatButtonState();
+    };
 
-        // При натискане на бутон "Добави чат"
-        addChatButton.addEventListener("click", addChat);
+    chatElement.appendChild(chatLink);
+    chatElement.appendChild(deleteButton);
+    chatList.appendChild(chatElement);
+}
+
+// Функция за добавяне на нов чат
+function addChat() {
+    if (chatCount >= maxChats) {
+        alert("Не можете да добавите повече от 10 чата.");
+        return;
+    }
+
+    const chatName = prompt("Въведете името на чата:") || `Чат ${chatCount + 1}`;
+    const chatId = `chat${chatCount + 1}`;
+
+    createChatElement(chatName, chatId);
+    chatCount++;
+    saveChats();
+    updateAddChatButtonState();
+}
+
+// Функция за обновяване на състоянието на бутона за добавяне
+function updateAddChatButtonState() {
+    addChatButton.disabled = chatCount >= maxChats;
+}
+
+// Зареждане на чатовете при стартиране
+window.onload = function () {
+    loadChats();
+    updateAddChatButtonState();
+};
+
+// Събитие за бутона за добавяне на чат
+addChatButton.addEventListener("click", addChat);
     </script>
 
 </body>
