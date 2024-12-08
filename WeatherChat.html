@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeliAI Weather</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1e1e30, #3e3e5e);
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            width: 400px;
+            height: 600px;
+            background: #2c2c44;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #6200ea;
+            color: #ffffff;
+            padding: 15px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-area {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #1e1e30;
+        }
+
+        .chat-area div {
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            max-width: 75%;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: #00c4cc;
+            color: #00353a;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background: #f1f1f1;
+            color: #333333;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-input {
+            display: flex;
+            border-top: 2px solid #444;
+            background: #2c2c44;
+            padding: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            background: #444;
+            color: #ffffff;
+            margin-right: 10px;
+            outline: none;
+        }
+
+        .chat-input input::placeholder {
+            color: #aaaaaa;
+        }
+
+        .chat-input button {
+            background: #6200ea;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background: #3700b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">VeliAI - Weather Assistant</div>
+        <div class="chat-area" id="chatArea"></div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Попитай за времето в град...">
+            <button id="sendBtn">Изпрати</button>
+        </div>
+    </div>
+    <script>
+        async function getWeather(city) {
+            const apiKey = "4da7f1c7eb204d92b4819c418ef77bc4"; // Замени с твоя API ключ
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=bg&appid=${apiKey}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.cod === 200) {
+                    return `Времето в ${data.name} е ${data.weather[0].description}, с температура от ${data.main.temp}°C и влажност ${data.main.humidity}%.`;
+                } else {
+                    return "Не намерих информация за този град.";
+                }
+            } catch (error) {
+                return "Грешка при свързването с прогнозата за времето.";
+            }
+        }
+
+        document.getElementById("sendBtn").addEventListener("click", async () => {
+            const userInput = document.getElementById("userInput").value.trim();
+            const chatArea = document.getElementById("chatArea");
+
+            if (!userInput) return;
+
+            // Показване на въпроса в чата
+            const userMessage = document.createElement("div");
+            userMessage.className = "user-message";
+            userMessage.textContent = userInput;
+            chatArea.appendChild(userMessage);
+
+            let responseMessage;
+            if (userInput.toLowerCase().includes("времето в")) {
+                const city = userInput.split("времето в")[1].trim();
+                responseMessage = await getWeather(city);
+            } else {
+                responseMessage = "Моля, попитайте за времето в конкретен град.";
+            }
+
+            // Показване на отговора
+            const botMessage = document.createElement("div");
+            botMessage.className = "bot-message";
+            botMessage.textContent = responseMessage;
+            chatArea.appendChild(botMessage);
+
+            // Изчистване на текстовото поле и скролване надолу
+            document.getElementById("userInput").value = "";
+            chatArea.scrollTop = chatArea.scrollHeight;
+        });
+    </script>
+</body>
+</html>
